@@ -31,13 +31,14 @@
     </div>
     <div class="container">
         <div class="container-wrapper">
-            <!-- <div class="box-circle">
+            <div class="box-circle">
                 <div class="circle" id="musicCircle">
-                    <img src="./viet-trang//anh/cd.png" alt="Music Icon" class="circle-image">
-                    <audio id="audio" src="./viet-trang//audio/lana-del-rey-video-games-128-ytshorts.savetube.me.mp3" loop></audio>
+                    <img src="./viet-trang/anh/cd.png" alt="Music Icon" class="circle-image">
+                    <audio id="audio1" src="./viet-trang/audio/Love Story - Taylor Swift.mp3"></audio>
+                    <audio id="audio2" src="./viet-trang/audio/Lover.mp3"></audio>
                 </div>
                 <label for="audio" class="lb-circle">No Music? <br> Click Me</label>
-            </div> -->
+            </div>
 
             <div class="box-top">
                 <div class="box-contop">
@@ -416,53 +417,77 @@
      });
 
   </script>
-   <script>
-const musicCircle = document.getElementById("musicCircle");
-const audio = document.getElementById("audio");
-const videoIframe = document.getElementById("video");
+<script>
+    const musicCircle = document.getElementById("musicCircle");
+    const audio1 = document.getElementById("audio1");
+    const audio2 = document.getElementById("audio2");
+    let currentAudio = 1; // Theo dõi bài nhạc hiện tại (1 hoặc 2)
+    let isPlaying = false; // Theo dõi trạng thái phát nhạc
 
-// Thêm sự kiện khi nhấn vào vòng tròn
-musicCircle.addEventListener("click", toggleMusic);
+    // Thêm sự kiện khi nhấn vào vòng tròn
+    musicCircle.addEventListener("click", toggleMusic);
 
-// Hàm điều khiển việc phát hoặc tạm dừng nhạc
-function toggleMusic() {
-    if (audio.paused) {
-        audio.play(); // Phát nhạc
-        musicCircle.classList.add("spin"); // Bắt đầu xoay
-    } else {
-        audio.pause(); // Dừng nhạc
-        musicCircle.classList.remove("spin"); // Dừng xoay
+    // Hàm điều khiển phát hoặc dừng nhạc
+    function toggleMusic() {
+        if (isPlaying) {
+            // Nếu đang phát, dừng cả hai bài
+            audio1.pause();
+            audio1.currentTime = 0;
+            audio2.pause();
+            audio2.currentTime = 0;
+            musicCircle.classList.remove("spin"); // Dừng xoay
+            isPlaying = false;
+        } else {
+            // Nếu đang dừng, phát bài hiện tại
+            if (currentAudio === 1) {
+                audio1.play();
+                audio2.pause();
+                audio2.currentTime = 0;
+            } else {
+                audio2.play();
+                audio1.pause();
+                audio1.currentTime = 0;
+            }
+            musicCircle.classList.add("spin"); // Bắt đầu xoay
+            isPlaying = true;
+        }
     }
-}
 
-// Tạo đối tượng YouTube Player API
-let player;
-
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('video', {
-        events: {
-            'onStateChange': onPlayerStateChange
+    // Khi bài 1 kết thúc, tự động phát bài 2
+    audio1.addEventListener('ended', function() {
+        if (isPlaying) {
+            audio1.currentTime = 0; // Đặt lại bài 1
+            audio2.play(); // Phát bài 2
+            currentAudio = 2;
+            musicCircle.classList.add("spin"); // Tiếp tục xoay
         }
     });
-}
 
-// Lắng nghe sự kiện trạng thái của video
-function onPlayerStateChange(event) {
-    // Khi video bắt đầu phát (state = 1), dừng nhạc và dừng xoay vòng tròn
-    if (event.data === YT.PlayerState.PLAYING) {
-        if (!audio.paused) {
-            audio.pause(); // Dừng nhạc
-            musicCircle.classList.remove("spin"); // Dừng xoay vòng tròn
+    // Khi bài 2 kết thúc, tự động phát bài 1
+    audio2.addEventListener('ended', function() {
+        if (isPlaying) {
+            audio2.currentTime = 0; // Đặt lại bài 2
+            audio1.play(); // Phát bài 1
+            currentAudio = 1;
+            musicCircle.classList.add("spin"); // Tiếp tục xoay
         }
+    });
+
+    // Tạo đối tượng YouTube Player API
+    let player;
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('video', {
+            events: {
+                'onStateChange': onPlayerStateChange
+            }
+        });
     }
-}
 
-// Tải API YouTube
-var tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
+    // Hàm xử lý sự kiện thay đổi trạng thái video YouTube
+    function onPlayerStateChange(event) {
+        // Có thể thêm logic nếu cần
+    }
 </script>
 </body>
 </html>
